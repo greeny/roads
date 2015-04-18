@@ -11,7 +11,6 @@ var cars = new Array();
 var grid = new Array();
 var semaphores = new Array();
 var tileSize = 40;
-var semaphoreCountdown = 120;
 
 //////////
 // GRID //
@@ -26,6 +25,7 @@ grid["10-13"] = 0;
 grid["10-14"] = 0;
 grid["10-15"] = 0;
 grid["11-10"] = 90;
+grid["11-12"] = 270;
 grid["11-15"] = 315;
 grid["12-10"] = 90;
 grid["12-15"] = 270;
@@ -49,7 +49,7 @@ grid["19-10"] = 180;
 grid["19-12"] = 270;
 
 // Semaphores
-semaphores["17-12"] = "green";
+semaphores["17-12"] = 'green';
 
 function drawGrid() {
     for (var i in grid) {
@@ -91,17 +91,14 @@ function drawGrid() {
 
 function switchSemaphores() {
     for (var i in semaphores) {
-        console.log('Countdown: ' + semaphoreCountdown);
-        if (semaphoreCountdown == 0 || semaphoreCountdown === undefined) {
-            if (semaphores[i] == 'red') {
-                semaphores[i] = 'green';
-            }  else {
-                semaphores[i] = 'red';
-            }
-            semaphoreCountdown = 120;
-        } else {
-            semaphoreCountdown--;
+        //console.log('Countdown: ' + semaphoreCountdown);
+
+        if (semaphores[i] == 'red') {
+            semaphores[i] = 'green';
+        }  else {
+            semaphores[i] = 'red';
         }
+
     }
 }
 
@@ -335,7 +332,7 @@ var Car = function(carTile, carSpeed) {
 // FUNCTIONS //
 ///////////////
 
-function drawAssets() {
+function drawCars() {
 
 	for (var i in cars) {
 	    cars[i].draw();
@@ -343,7 +340,7 @@ function drawAssets() {
 
 }
 
-function moveAssets() {
+function moveCars() {
 
     for (var i in cars) {
         cars[i].move();
@@ -368,11 +365,18 @@ function collisionDetection() {
 // SPAWN
 cars[0] = new Car("10-13", 1);
 cars[1] = new Car("19-10", 2);
-//cars[2] = new Car("15-14", 1);
+cars[2] = new Car("15-14", 1);
 
-for (var i in semaphores) {
-    semaphores[i].countdown = 60;
+// SEMAPHORES
+setInterval(function(){ switchSemaphores() }, 2000);
+
+// CAR LOOP
+setInterval(function(){ carLoop() }, 10);
+function carLoop() {
+    moveCars();
+    collisionDetection();
 }
+
 
 ///////////////
 // GAME LOOP //
@@ -394,19 +398,11 @@ function render() {
             drawGrid();
         }
 
-        switchSemaphores();
-        drawSemaphores();
-
-        // Move assets
-        moveAssets();
-
-        // Detect collisions
-        collisionDetection();
-
         // Draw assets
-        drawAssets();
+        drawSemaphores();
+        drawCars();
 
-        // Draw canvas
+        // Render canvas
         canvas.renderAll();
 
     }
