@@ -49,8 +49,19 @@ grid["19-10"] = 180;
 grid["19-12"] = 270;
 
 // Semaphores
+semaphores["11-12"] = {
+    state: 'green',
+    angle: 0,
+    elements: {}
+};
+semaphores["16-11"] = {
+    state: 'red',
+    angle: 270,
+    elements: {}
+};
 semaphores["17-12"] = {
     state: 'green',
+    angle: 0,
     elements: {}
 };
 
@@ -198,6 +209,12 @@ function drawSemaphores() {
             selectable: false
         });
 
+        if (semaphores[i].angle == 0) {
+            semaphores[i].top = this.y;
+        } else if (semaphores[i].angle == 270) {
+            semaphores[i].top = this.y + tileSize;
+        }
+
         semaphores[i].element = new fabric.Group([
             semaphores[i].elements.semaphoreBar,
             semaphores[i].elements.semaphoreRed,
@@ -205,8 +222,8 @@ function drawSemaphores() {
             semaphores[i].elements.semaphoreGreen
         ], {
             left: this.x,
-            top: this.y,
-            angle: 0,
+            top: semaphores[i].top,
+            angle: semaphores[i].angle,
             selectable: false
         });
 
@@ -331,41 +348,38 @@ var Car = function(carTile, carSpeed) {
 
             if (this.direction !== undefined) {
 
-                if (this.direction == 0) {
-                    this.moveY = -this.speed;
-                    this.moveX = 0;
-                } else if (this.direction == 45) {
-                    this.moveY = -0.5 * this.speed;
-                    this.moveX = 0.5 * this.speed;
-                } else if (this.direction == 90) {
-                    this.moveY = 0;
-                    this.moveX = this.speed;
-                } else if (this.direction == 135) {
-                    this.moveY = 0.5 * this.speed;
-                    this.moveX = 0.5 * this.speed;
-                } else if (this.direction == 180) {
-                    this.moveY = this.speed;
-                    this.moveX = 0;
-                } else if (this.direction == 225) {
-                    this.moveY = 0.5 * this.speed;
-                    this.moveX = -0.5 * this.speed;
-                } else if (this.direction == 270) {
-                    activeSemaphore = semaphores[getTile(this.x,this.y)];
-                    if (activeSemaphore && activeSemaphore.state == "red") {
-
-                        this.moveX = 0;
-
-                    } else {
-
-                        this.moveY = 0;
-                        this.moveX = -this.speed;
-                    }
-                } else if (this.direction == 315) {
-                    this.moveY = -0.5 * this.speed;
-                    this.moveX = -0.5 * this.speed;
+                activeSemaphore = semaphores[getTile(this.x,this.y)];
+                if (activeSemaphore && activeSemaphore.state == "red") {
+                    this.go = 0;
+                } else {
+                    this.go = 1;
                 }
 
-
+                if (this.direction == 0) {
+                    this.moveY = -this.speed * this.go;
+                    this.moveX = 0;
+                } else if (this.direction == 45) {
+                    this.moveY = -0.5 * this.speed * this.go;
+                    this.moveX = 0.5 * this.speed * this.go;
+                } else if (this.direction == 90) {
+                    this.moveY = 0;
+                    this.moveX = this.speed * this.go;
+                } else if (this.direction == 135) {
+                    this.moveY = 0.5 * this.speed * this.go;
+                    this.moveX = 0.5 * this.speed * this.go;
+                } else if (this.direction == 180) {
+                    this.moveY = this.speed * this.go;
+                    this.moveX = 0;
+                } else if (this.direction == 225) {
+                    this.moveY = 0.5 * this.speed * this.go;
+                    this.moveX = -0.5 * this.speed * this.go;
+                } else if (this.direction == 270) {
+                    this.moveY = 0;
+                    this.moveX = -this.speed * this.go;
+                } else if (this.direction == 315) {
+                    this.moveY = -0.5 * this.speed * this.go;
+                    this.moveX = -0.5 * this.speed * this.go;
+                }
 
                 this.targetAngle = this.direction;
 
@@ -427,7 +441,7 @@ function collisionDetection() {
 }
 
 // SPAWN
-cars[0] = new Car("10-13", 1);
+cars[0] = new Car("10-13", 2);
 cars[1] = new Car("19-10", 2);
 cars[2] = new Car("15-14", 1);
 
