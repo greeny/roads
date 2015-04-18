@@ -3,7 +3,10 @@
 //////////
 console.log("Starting up...");
 var runGameLoop = true;
-var canvas = new fabric.Canvas('c');
+var canvas = new fabric.Canvas('c', {
+    renderOnAddRemove: false,
+    stateful: false
+});
 var cars = new Array();
 var grid = new Array();
 var semaphores = new Array();
@@ -402,6 +405,9 @@ function render() {
 
         // Draw assets
         drawAssets();
+
+        // Draw canvas
+        canvas.renderAll();
 
     }
 
