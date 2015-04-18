@@ -8,7 +8,7 @@ var canvas = new fabric.Canvas('c', {
     stateful: false
 });
 var cars = new Array();
-var grid = new Array();
+var grid = {};
 var semaphores = new Array();
 var tileSize = 40;
 
@@ -55,11 +55,22 @@ semaphores["17-12"] = {
 };
 
 function drawGrid() {
-    for (var i in grid) {
-        this.x = i.split("-")[0] * tileSize;
-        this.y = i.split("-")[1] * tileSize;
+    var tileOutline;
+    var tileDirection;
+    var tileCoords;
+    var x, y;
 
-        this.tileOutline = new fabric.Rect({
+    for (var i in grid) {
+        grid[i] = {
+            direction: grid[i]
+        };
+    }
+
+    for (var i in grid) {
+        x = i.split("-")[0] * tileSize;
+        y = i.split("-")[1] * tileSize;
+
+        tileOutline = new fabric.Rect({
             fill: 'white',
             strokeWidth: 1,
             stroke: '#ececec',
@@ -68,26 +79,44 @@ function drawGrid() {
             originX: 'center',
             originY: 'center'
         });
-        this.tileDirection = new fabric.Text("↑", {
-            angle: grid[i],
+        tileDirection = new fabric.Text("↑", {
+            angle: grid[i].direction,
             fontSize: 16,
             fill: '#ececec',
             originX: 'center',
             originY: 'center'
         });
-        this.tileCoords = new fabric.Text(i, {
+        tileCoords = new fabric.Text(i, {
             fontSize: 12,
             fill: '#ececec',
             originX: 'center',
             originY: 'center',
             top: tileSize / 3
         });
-        this.tile = new fabric.Group([ this.tileOutline, this.tileDirection, this.tileCoords ], {
-            left: this.x,
-            top: this.y
+        grid[i].element = new fabric.Group([ tileOutline, tileDirection, tileCoords ], {
+            left: x,
+            top: y
         });
 
-        canvas.add(this.tile);
+        canvas.add(grid[i].element);
+    }
+}
+
+
+function showGrid() {
+    for (var i in grid) {
+        grid[i].element.set({
+            opacity: 1
+        });
+    }
+}
+
+
+function hideGrid() {
+    for (var i in grid) {
+        grid[i].element.set({
+            opacity: 0
+        });
     }
 }
 
@@ -178,7 +207,7 @@ function drawSemaphores() {
 }
 
 function getTileDirection(tile) {
-    return grid[tile];
+    return grid[tile] && grid[tile].direction;
 }
 
 function getTile(x,y) {
@@ -431,10 +460,15 @@ window.requestAnimFrame = (function() {
 })();
 
 // Draw grid
-if (document.getElementById("displaygrid").checked) {
-    drawGrid();
-}
+document.getElementById('displaygrid').addEventListener('change', function() {
+    if (this.checked) {
+        showGrid();
+    } else {
+        hideGrid();
+    }
+});
 
+drawGrid();
 drawSemaphores();
 switchSemaphores();
 drawCars();
