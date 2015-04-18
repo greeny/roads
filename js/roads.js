@@ -49,7 +49,10 @@ grid["19-10"] = 180;
 grid["19-12"] = 270;
 
 // Semaphores
-semaphores["17-12"] = 'green';
+semaphores["17-12"] = {
+    state: 'green',
+    elements: {}
+};
 
 function drawGrid() {
     for (var i in grid) {
@@ -93,10 +96,24 @@ function switchSemaphores() {
     for (var i in semaphores) {
         //console.log('Countdown: ' + semaphoreCountdown);
 
-        if (semaphores[i] == 'red') {
-            semaphores[i] = 'green';
-        }  else {
-            semaphores[i] = 'red';
+        if (semaphores[i].state == 'red') {
+            semaphores[i].state = 'green';
+        } else {
+            semaphores[i].state = 'red';
+        }
+
+        if (semaphores[i].state == 'red') {
+            semaphores[i].elements.semaphoreRed.set({ 'radius': 6 });
+            semaphores[i].elements.semaphoreOrange.set({ 'radius': 4 });
+            semaphores[i].elements.semaphoreGreen.set({ 'radius': 4 });
+        } else if (semaphores[i].state == 'orange') {
+            semaphores[i].elements.semaphoreOrange.set({ 'radius': 6 });
+            semaphores[i].elements.semaphoreRed.set({ 'radius': 4 });
+            semaphores[i].elements.semaphoreGreen.set({ 'radius': 4 });
+        } else if (semaphores[i].state == 'green') {
+            semaphores[i].elements.semaphoreGreen.set({ 'radius': 6 });
+            semaphores[i].elements.semaphoreRed.set({ 'radius': 4 });
+            semaphores[i].elements.semaphoreOrange.set({ 'radius': 4 });
         }
 
     }
@@ -108,7 +125,7 @@ function drawSemaphores() {
         this.x = i.split("-")[0] * tileSize;
         this.y = i.split("-")[1] * tileSize;
 
-        this.semaphoreBar = new fabric.Line([0, 0, 0, tileSize], {
+        semaphores[i].elements.semaphoreBar = new fabric.Line([0, 0, 0, tileSize], {
             fill: 'black',
             stroke: 'black',
             strokeWidth: 4,
@@ -117,7 +134,7 @@ function drawSemaphores() {
             originY: 'center'
         });
 
-        this.semaphoreRed = new fabric.Circle({
+        semaphores[i].elements.semaphoreRed = new fabric.Circle({
             radius: 4,
             fill: 'red',
             originX: 'center',
@@ -126,7 +143,7 @@ function drawSemaphores() {
             top: (tileSize / 4)
         });
 
-        this.semaphoreOrange = new fabric.Circle({
+        semaphores[i].elements.semaphoreOrange = new fabric.Circle({
             radius: 4,
             fill: 'orange',
             originX: 'center',
@@ -135,7 +152,7 @@ function drawSemaphores() {
             top: 2 * (tileSize / 4)
         });
 
-        this.semaphoreGreen = new fabric.Circle({
+        semaphores[i].elements.semaphoreGreen = new fabric.Circle({
             radius: 4,
             fill: 'green',
             originX: 'center',
@@ -144,21 +161,18 @@ function drawSemaphores() {
             top: 3 * (tileSize / 4)
         });
 
-        if (semaphores[i] == 'red') {
-            this.semaphoreRed.set({ 'radius': 6 });
-        } else if (semaphores[i] == 'orange') {
-            this.semaphoreOrange.set({ 'radius': 6 });
-        } else if (semaphores[i] == 'green') {
-            this.semaphoreGreen.set({ 'radius': 6 });
-        }
-
-        this.semaphore = new fabric.Group([ this.semaphoreBar, this.semaphoreRed, this.semaphoreOrange, this.semaphoreGreen ], {
+        semaphores[i].element = new fabric.Group([
+            semaphores[i].elements.semaphoreBar,
+            semaphores[i].elements.semaphoreRed,
+            semaphores[i].elements.semaphoreOrange,
+            semaphores[i].elements.semaphoreGreen
+        ], {
             left: this.x,
             top: this.y,
             angle: 0
         });
 
-        canvas.add(this.semaphore);
+        canvas.add(semaphores[i].element);
 
     }
 }
@@ -218,54 +232,56 @@ var Car = function(carTile, carSpeed) {
     this.moveX = carMoveX;
     this.moveY = carMoveY;
     this.angle = carAngle;
-	
-	Car.prototype.draw = function() {
 
-        this.chasis = new fabric.Rect({
-            fill: this.color,
-            width: this.width,
-            height: this.height,
-            rx: 3,
-            ry: 3,
-            originX: 'center',
-            originY: 'center'
-        });
+    this.chasis = new fabric.Rect({
+        fill: this.color,
+        width: this.width,
+        height: this.height,
+        rx: 3,
+        ry: 3,
+        originX: 'center',
+        originY: 'center'
+    });
 
-        this.breakLightLeft = new fabric.Circle({
-            radius: 2,
-            fill: 'red',
-            originX: 'center',
-            originY: 'center',
-            left: -(this.width / 2) + 3,
-            top: this.height / 2 - 1
-        });
+    this.breakLightLeft = new fabric.Circle({
+        radius: 2,
+        fill: 'red',
+        originX: 'center',
+        originY: 'center',
+        left: -(this.width / 2) + 3,
+        top: this.height / 2 - 1
+    });
 
-        this.breakLightRight = new fabric.Circle({
-            radius: 2,
-            fill: 'red',
-            originX: 'center',
-            originY: 'center',
-            left: (this.width / 2) - 3,
-            top: this.height / 2 - 1
-        });
+    this.breakLightRight = new fabric.Circle({
+        radius: 2,
+        fill: 'red',
+        originX: 'center',
+        originY: 'center',
+        left: (this.width / 2) - 3,
+        top: this.height / 2 - 1
+    });
 
-        this.output = new fabric.Group([ this.chasis, this.breakLightLeft, this.breakLightRight ], {
-            left: this.x,
-            top: this.y,
-            originX: 'center',
-            originY: 'center',
-            angle: this.angle
-        });
+    this.element = new fabric.Group([ this.chasis, this.breakLightLeft, this.breakLightRight ], {
+        left: this.x,
+        top: this.y,
+        originX: 'center',
+        originY: 'center',
+        angle: this.angle
+    });
 
-        canvas.add(this.output);
-	}
+    canvas.add(this.element);
 
     Car.prototype.turnRight = function(currentAngle) {
         this.moveX = (this.angle / 100) * 3;
         this.angle++;
     }
 
+    Car.prototype.draw = function(canvas) {
+        canvas.add(this.element);
+    }
+
     Car.prototype.move = function() {
+        var activeSemaphore;
 
         if ( (typeof this.x === 'number' && (this.x % 1) === 0) && (typeof this.y === 'number' && (this.y % 1) === 0) ) {
 
@@ -292,8 +308,8 @@ var Car = function(carTile, carSpeed) {
                     this.moveY = 0.5 * this.speed;
                     this.moveX = -0.5 * this.speed;
                 } else if (this.direction == 270) {
-
-                    if (semaphores[getTile(this.x,this.y)] == "red") {
+                    activeSemaphore = semaphores[getTile(this.x,this.y)];
+                    if (activeSemaphore && activeSemaphore.state == "red") {
 
                         this.moveX = 0;
 
@@ -324,6 +340,12 @@ var Car = function(carTile, carSpeed) {
         this.x = this.x + this.moveX;
         this.y = this.y + this.moveY;
 
+        this.element.set({
+            left: this.x,
+            top: this.y,
+            angle: this.angle
+        });
+
     }
 
 };
@@ -335,7 +357,7 @@ var Car = function(carTile, carSpeed) {
 function drawCars() {
 
 	for (var i in cars) {
-	    cars[i].draw();
+	    cars[i].draw(canvas);
     }
 
 }
@@ -390,18 +412,6 @@ function render() {
         // Debug
         //simStatus();
 
-        // Clear screen
-        canvas.clear();
-
-        // Draw grid
-        if (document.getElementById("displaygrid").checked) {
-            drawGrid();
-        }
-
-        // Draw assets
-        drawSemaphores();
-        drawCars();
-
         // Render canvas
         canvas.renderAll();
 
@@ -419,6 +429,15 @@ window.requestAnimFrame = (function() {
 	    window.setTimeout(callback, 1000 / 60);
 	};
 })();
+
+// Draw grid
+if (document.getElementById("displaygrid").checked) {
+    drawGrid();
+}
+
+drawSemaphores();
+switchSemaphores();
+drawCars();
 
 (function animloop(){
 	requestAnimFrame(animloop);
