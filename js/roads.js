@@ -77,25 +77,29 @@ function drawGrid() {
             width: tileSize,
             height: tileSize,
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: false
         });
         tileDirection = new fabric.Text("↑", {
             angle: grid[i].direction,
             fontSize: 16,
             fill: '#ececec',
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: false
         });
         tileCoords = new fabric.Text(i, {
             fontSize: 12,
             fill: '#ececec',
             originX: 'center',
             originY: 'center',
-            top: tileSize / 3
+            top: tileSize / 3,
+            selectable: false
         });
         grid[i].element = new fabric.Group([ tileOutline, tileDirection, tileCoords ], {
             left: x,
-            top: y
+            top: y,
+            selectable: false
         });
 
         canvas.add(grid[i].element);
@@ -160,7 +164,8 @@ function drawSemaphores() {
             strokeWidth: 4,
             selectable: false,
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: false
         });
 
         semaphores[i].elements.semaphoreRed = new fabric.Circle({
@@ -169,7 +174,8 @@ function drawSemaphores() {
             originX: 'center',
             originY: 'center',
             left: 1,
-            top: (tileSize / 4)
+            top: (tileSize / 4),
+            selectable: false
         });
 
         semaphores[i].elements.semaphoreOrange = new fabric.Circle({
@@ -178,7 +184,8 @@ function drawSemaphores() {
             originX: 'center',
             originY: 'center',
             left: 1,
-            top: 2 * (tileSize / 4)
+            top: 2 * (tileSize / 4),
+            selectable: false
         });
 
         semaphores[i].elements.semaphoreGreen = new fabric.Circle({
@@ -187,7 +194,8 @@ function drawSemaphores() {
             originX: 'center',
             originY: 'center',
             left: 1,
-            top: 3 * (tileSize / 4)
+            top: 3 * (tileSize / 4),
+            selectable: false
         });
 
         semaphores[i].element = new fabric.Group([
@@ -198,7 +206,8 @@ function drawSemaphores() {
         ], {
             left: this.x,
             top: this.y,
-            angle: 0
+            angle: 0,
+            selectable: false
         });
 
         canvas.add(semaphores[i].element);
@@ -269,7 +278,8 @@ var Car = function(carTile, carSpeed) {
         rx: 3,
         ry: 3,
         originX: 'center',
-        originY: 'center'
+        originY: 'center',
+        selectable: false
     });
 
     this.breakLightLeft = new fabric.Circle({
@@ -278,7 +288,8 @@ var Car = function(carTile, carSpeed) {
         originX: 'center',
         originY: 'center',
         left: -(this.width / 2) + 3,
-        top: this.height / 2 - 1
+        top: this.height / 2 - 1,
+        selectable: false
     });
 
     this.breakLightRight = new fabric.Circle({
@@ -287,7 +298,8 @@ var Car = function(carTile, carSpeed) {
         originX: 'center',
         originY: 'center',
         left: (this.width / 2) - 3,
-        top: this.height / 2 - 1
+        top: this.height / 2 - 1,
+        selectable: false
     });
 
     this.element = new fabric.Group([ this.chasis, this.breakLightLeft, this.breakLightRight ], {
@@ -295,7 +307,8 @@ var Car = function(carTile, carSpeed) {
         top: this.y,
         originX: 'center',
         originY: 'center',
-        angle: this.angle
+        angle: this.angle,
+        selectable: false
     });
 
     canvas.add(this.element);
