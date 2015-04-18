@@ -431,15 +431,47 @@ cars[0] = new Car("10-13", 1);
 cars[1] = new Car("19-10", 2);
 cars[2] = new Car("15-14", 1);
 
-// SEMAPHORES
-setInterval(function(){ switchSemaphores() }, 2000);
+var gameRunning = false;
+var gameLastLoopTimestamp = 0;
+var gameJobs = [];
 
-// CAR LOOP
-setInterval(function(){ carLoop() }, 10);
-function carLoop() {
+function job(each, callback) {
+    gameJobs.push({
+        each: each,
+        callback: callback,
+        lastRun: 0
+    });
+}
+
+function runJobs() {
+    var job;
+    for (var index in gameJobs) {
+        job = gameJobs[index];
+        if ((job.lastRun + job.each) <= gameLastLoopTimestamp) {
+            job.callback();
+            job.lastRun = gameLastLoopTimestamp;
+        }
+    }
+}
+
+(function gameLoop() {
+    setTimeout(function() {
+        if (gameRunning) {
+            gameLastLoopTimestamp += 10;
+            runJobs();
+            gameRunning = false;
+        }
+        gameLoop();
+    }, 10);
+})();
+
+job(2000, function() {
+    switchSemaphores();
+});
+job(10, function() {
     moveCars();
     collisionDetection();
-}
+});
 
 
 ///////////////
@@ -487,6 +519,7 @@ switchSemaphores();
 drawCars();
 
 (function animloop(){
+    gameRunning = true;
 	requestAnimFrame(animloop);
 	render();
 })();
