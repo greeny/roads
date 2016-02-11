@@ -385,6 +385,13 @@ var Car = function(carTile, carSpeed) {
 
             }
 
+            // fix for rotating cars
+            if (this.targetAngle - this.angle > 180) {
+                this.angle += 360;
+            } else if (this.angle - this.targetAngle > 180) {
+                this.angle -= 360;
+            }
+
             if (this.targetAngle > this.angle) {
                 this.angle += 15;
             } else if (this.targetAngle < this.angle) {
@@ -510,9 +517,9 @@ function render() {
 window.requestAnimFrame = (function() {
 	return  window.requestAnimationFrame       ||
 	window.webkitRequestAnimationFrame ||
-	window.mozRequestAnimationFrame    || 
-	window.oRequestAnimationFrame      || 
-	window.msRequestAnimationFrame     || 
+	window.mozRequestAnimationFrame    ||
+	window.oRequestAnimationFrame      ||
+	window.msRequestAnimationFrame     ||
 	function( callback ) {
 	    window.setTimeout(callback, 1000 / 60);
 	};
